@@ -1,0 +1,10 @@
+if(fileName(ENV:SHELL)=='fish')
+  G:SHELL="/usr/bin/bash"
+    Hello
+      Hi
+  Print("Set shell to bash")
+else
+  Print("Using ENV shell")
+
+all"Builds all files":
+  Print("Did it work?")
