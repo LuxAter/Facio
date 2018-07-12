@@ -57,17 +57,15 @@ facio_token_t facio_scan(facio_lexer* lexer)
 {
   int c;
 scan:
+  if (lexer->tok.type == EOL || lexer->tok.type == DEDENT) {
+    facio_token_t tok = scan_indent(lexer, c);
+    if (tok.type != NILL) {
+      return set_ret(lexer, tok);
+    }
+  }
   switch (c = fgetc(lexer->file)) {
   case ' ':
   case '\t':
-    if (lexer->tok.type == EOL || lexer->tok.type == DEDENT) {
-      facio_token_t tok = scan_indent(lexer, c);
-      if (tok.type == NILL) {
-        goto scan;
-      } else {
-        return set_ret(lexer, tok);
-      }
-    }
     goto scan;
   case '\n':
   case '\r':
@@ -162,6 +160,9 @@ facio_token_t scan_ident(facio_lexer* lexer, char c)
     if (strncmp(buf, "for", len) == 0) {
       return facio_get_token(FOR, "for");
     }
+    if (strncmp(buf, "def", len) == 0) {
+      return facio_get_token(DEF, "def");
+    }
   case 4:
     if (strncmp(buf, "else", len) == 0) {
       return facio_get_token(ELSE, "else");
@@ -240,6 +241,10 @@ facio_token_t scan_indent(facio_lexer* lexer, char c)
   ungetc(c, lexer->file);
   char buf[128];
   uint8_t top = facio_stack_peek(lexer);
+  if (count == 0 && lexer->indent_stack.top != 0) {
+    facio_stack_pop(lexer);
+    return facio_get_token(DEDENT, "0");
+  }
   if (count > top) {
     facio_stack_push(lexer, count);
     sprintf(buf, "%d", count);

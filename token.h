@@ -29,6 +29,7 @@
   t(OP_ASSIGN, "=") \
   t(SEMICOLON, ";") \
   t(COMMA, ",") \
+  t(DEF, "def") \
   t(INDENT, "->") \
   t(DEDENT, "<-") \
   t(NILL, "null") \
