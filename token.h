@@ -7,7 +7,7 @@
 
 #define FACIO_TOKEN_LIST \
   t(ILLEGAL, "illegal") \
-  t(ID, "id") \
+  t(IDENTIFIER, "identifier") \
   t(INT, "int") \
   t(FLOAT, "float") \
   t(STRING, "string") \
@@ -25,7 +25,16 @@
   t(RBRACK, "]") \
   t(COLON, ":") \
   t(QMARK, "?") \
+  t(OP_ADD, "+") \
+  t(OP_SUB, "-") \
+  t(OP_MUL, "*") \
+  t(OP_DIV, "/") \
+  t(OP_MOD, "%") \
   t(OP_EQ, "==") \
+  t(OP_L, "<") \
+  t(OP_G, ">") \
+  t(OP_LE, "<=") \
+  t(OP_GE, ">=") \
   t(OP_ASSIGN, "=") \
   t(SEMICOLON, ";") \
   t(COMMA, ",") \
@@ -37,7 +46,7 @@
   t(EOS, "end-of-source") \
 
 typedef enum {
-#define t(tok, str) tok,
+#define t(tok, str) T_##tok,
 FACIO_TOKEN_LIST
 #undef t
 } facio_token;
@@ -60,7 +69,7 @@ typedef struct {
 } facio_token_t;
 
 static inline const char* facio_token_type_string(facio_token type){
-  assert(type <= EOS);
+  assert(type <= T_EOS);
   return facio_token_strings[type];
 }
 
