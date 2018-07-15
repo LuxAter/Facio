@@ -1,9 +1,7 @@
-#ifndef FACIO_TOKEN_H_
-#define FACIO_TOKEN_H_
+#ifndef FACIO_TOKEN_HPP_
+#define FACIO_TOKEN_HPP_
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
+#include <string>
 
 #define FACIO_TOKEN_LIST \
   t(ILLEGAL, "illegal") \

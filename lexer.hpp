@@ -1,11 +1,11 @@
-#ifndef FACIO_LEXER_H_
-#define FACIO_LEXER_H_
+#ifndef FACIO_LEXER_HPP_
+#define FACIO_LEXER_HPP_
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <cstdio>
+#include <cstdint>
+#include <stack>
 
-#include "token.h"
+#include "token.hpp"
 
 #define FACIO_STATE_LIST \
   s(TRANSLATION_UNIT, "translation-unit") \
@@ -46,33 +46,22 @@ FACIO_STATE_LIST
 };
 
 static inline const char* facio_state_string(facio_state state){
-  assert(state <= S_END);
   return facio_state_strings[state];
 }
 
-typedef struct {
+struct Lexer {
+  Lexer(std::string file_name);
   uint32_t line_num_, column_num_;
-  const char* filename;
+  std::string filename;
   FILE* file;
-  facio_token_t tok;
-  struct {
-    uint8_t top;
-    uint8_t* array;
-  } indent_stack;
-} facio_lexer;
-
-bool facio_lexer_init(facio_lexer *self, const char* filename);
-
-void facio_stack_push(facio_lexer *lexer, uint8_t value);
-uint8_t facio_stack_pop(facio_lexer *lexer);
-uint8_t facio_stack_peek(facio_lexer *lexer);
-
-facio_token_t facio_scan(facio_lexer *lexer);
-
-facio_token_t scan_string(facio_lexer *lexer, char quote);
-facio_token_t scan_ident(facio_lexer *lexer, char c);
-facio_token_t scan_number(facio_lexer *lexer, char c);
-facio_token_t scan_indent(facio_lexer *lexer, char c);
+  Token tok, next;
+  std::stack<uint8_t> indent;
+  Token Scan();
+  Token ScanString(char quote);
+  Token ScanIdentifier(char c);
+  Token ScanNumber(char c);
+  Token ScanIndent(char c);
+};
 
 
-#endif // FACIO_LEXER_H_
+#endif // FACIO_LEXER_HPP_

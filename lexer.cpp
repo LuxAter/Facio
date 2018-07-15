@@ -1,4 +1,4 @@
-#include "lexer.h"
+#include "lexer.hpp"
 
 #include <ctype.h>
 #include <math.h>
@@ -16,42 +16,19 @@ facio_token_t set_ret(facio_lexer* lexer, facio_token_t tok)
   return tok;
 }
 
-bool facio_lexer_init(facio_lexer* self, const char* filename)
-{
-  self->filename = strdup(filename);
-  self->line_num_ = 0;
-  self->column_num_ = 0;
-  self->indent_stack.top = 0;
-  self->indent_stack.array = (uint8_t*)malloc(128 * sizeof(uint8_t));
-  self->file = fopen(filename, "r");
-  if (!self->file) {
-    return false;
-    self->file = NULL;
-  } else {
-    return true;
-  }
+Lexer::Lexer(std::string file_name){
+  filename = file_name;
+  line_num_ = 0;
+  column_num_ = 0;
+  file = fopen(filename, "r");
 }
 
-void facio_stack_push(facio_lexer* lexer, uint8_t value)
-{
-  if (lexer->indent_stack.top != 128) {
-    lexer->indent_stack.array[++(lexer->indent_stack.top) - 1] = value;
-  }
+Token Lexer::Scan(){
+  char c;
 }
-uint8_t facio_stack_pop(facio_lexer* lexer)
-{
-  if (lexer->indent_stack.top != 0) {
-    return lexer->indent_stack.array[(lexer->indent_stack.top)-- - 1];
-  }
-  return 0;
-}
-uint8_t facio_stack_peek(facio_lexer* lexer)
-{
-  if (lexer->indent_stack.top != 0) {
-    return lexer->indent_stack.array[lexer->indent_stack.top - 1];
-  }
-  return 0;
-}
+
+
+
 
 facio_token_t facio_scan(facio_lexer* lexer)
 {

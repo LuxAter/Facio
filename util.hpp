@@ -1,5 +1,5 @@
-#ifndef FACIO_UTIL_H_
-#define FACIO_UTIL_H_
+#ifndef FACIO_UTIL_HPP_
+#define FACIO_UTIL_HPP_
 
 #include <stdio.h>
 
@@ -10,4 +10,4 @@ static inline int fpeek(FILE* stream){
   return c;
 }
 
-#endif  // FACIO_UTIL_H_
+#endif  // FACIO_UTIL_HPP_
