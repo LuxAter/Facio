@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 #define FACIO_TOKEN_LIST \
   t(ILLEGAL, "illegal") \
@@ -60,6 +62,7 @@ FACIO_TOKEN_LIST
 typedef struct {
   int len;
   const char* src;
+  uint32_t line_num_, column_num_;
   struct {
     long int int_;
     double float_;
