@@ -1,11 +1,3 @@
-if(baseName(ENV:SHELL)=='fish')
+if(BaseName(ENV:SHELL) == 'fish')
   G:SHELL="/usr/bin/bash"
   Print("Set shell to bash")
-else
-  Print("Using ENV shell")
-
-def g:compile(file)
-  Shell(echo "Hello!")
-
-all "Builds all files":
-  Print("Did it work?")

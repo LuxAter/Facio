@@ -12,8 +12,13 @@
 
 facio_token_t set_ret(facio_lexer* lexer, facio_token_t tok)
 {
-  lexer->tok = tok;
-  return tok;
+  tok.line_num_ = lexer->line_num_;
+  tok.column_num_ = lexer->column_num_;
+  lexer->column_num_ += strlen(tok.src);
+  lexer->tok = lexer->next;
+  lexer->next= tok;
+  printf("[%s::%s]\n", facio_token_type_string(lexer->tok.type), lexer->tok.src);
+  return lexer->tok;
 }
 
 bool facio_lexer_init(facio_lexer* self, const char* filename)
@@ -23,13 +28,14 @@ bool facio_lexer_init(facio_lexer* self, const char* filename)
   self->column_num_ = 0;
   self->indent_stack.top = 0;
   self->indent_stack.array = (uint8_t*)malloc(128 * sizeof(uint8_t));
+  self->tok.type = T_NILL;
+  self->next.type = T_NILL;
   self->file = fopen(filename, "r");
   if (!self->file) {
     return false;
-    self->file = NULL;
-  } else {
-    return true;
   }
+  facio_scan(self);
+  return true;
 }
 
 void facio_stack_push(facio_lexer* lexer, uint8_t value)
@@ -57,7 +63,7 @@ facio_token_t facio_scan(facio_lexer* lexer)
 {
   int c;
 scan:
-  if (lexer->tok.type == T_EOL || lexer->tok.type == T_DEDENT) {
+  if (lexer->next.type == T_EOL || lexer->next.type == T_DEDENT) {
     facio_token_t tok = scan_indent(lexer, c);
     if (tok.type != T_NILL) {
       return set_ret(lexer, tok);
@@ -95,18 +101,18 @@ scan:
   case '>':
     return set_ret(lexer, facio_get_token(T_OP_G, "<"));
   case '=':
-    switch(fpeek(lexer->file)){
-      case '=':
-        fgetc(lexer->file);
-        return set_ret(lexer, facio_get_token(T_OP_EQ, "=="));
-      case '<':
-        fgetc(lexer->file);
-        return set_ret(lexer, facio_get_token(T_OP_LE, "<="));
-      case '>':
-        fgetc(lexer->file);
-        return set_ret(lexer, facio_get_token(T_OP_GE, ">="));
-      default:
-        return set_ret(lexer, facio_get_token(T_OP_ASSIGN, "="));
+    switch (fpeekc(lexer->file)) {
+    case '=':
+      fgetc(lexer->file);
+      return set_ret(lexer, facio_get_token(T_OP_EQ, "=="));
+    case '<':
+      fgetc(lexer->file);
+      return set_ret(lexer, facio_get_token(T_OP_LE, "<="));
+    case '>':
+      fgetc(lexer->file);
+      return set_ret(lexer, facio_get_token(T_OP_GE, ">="));
+    default:
+      return set_ret(lexer, facio_get_token(T_OP_ASSIGN, "="));
     }
   case EOF:
     return set_ret(lexer, facio_get_token(T_EOS, "EOF"));
@@ -120,6 +126,11 @@ scan:
       return set_ret(lexer, scan_number(lexer, c));
     return set_ret(lexer, facio_get_token(T_ILLEGAL, "illegal"));
   }
+}
+
+facio_token_t facio_peek(facio_lexer* lexer)
+{
+  return lexer->next;
 }
 
 facio_token_t scan_string(facio_lexer* lexer, char quote)
@@ -161,7 +172,7 @@ facio_token_t scan_string(facio_lexer* lexer, char quote)
     buf[len++] = c;
   }
   buf[len++] = 0;
-  return facio_get_token(T_STRING, buf);
+  return facio_get_token_string(T_STRING, buf);
 }
 facio_token_t scan_ident(facio_lexer* lexer, char c)
 {
@@ -177,12 +188,18 @@ facio_token_t scan_ident(facio_lexer* lexer, char c)
     if (strncmp(buf, "if", len) == 0) {
       return facio_get_token(T_IF, "if");
     }
+    if(strncmp(buf, "or", len) == 0){
+      return facio_get_token(T_OP_OR, "or");
+    }
   case 3:
     if (strncmp(buf, "for", len) == 0) {
       return facio_get_token(T_FOR, "for");
     }
     if (strncmp(buf, "def", len) == 0) {
       return facio_get_token(T_DEF, "def");
+    }
+    if(strncmp(buf, "and", len) == 0){
+      return facio_get_token(T_OP_AND, "and");
     }
   case 4:
     if (strncmp(buf, "else", len) == 0) {
