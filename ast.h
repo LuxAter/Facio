@@ -104,4 +104,20 @@ ast_node* function_def_node(ast_node* name, vector* params, ast_node* stmts);
 ast_node* target_def_node(facio_token_t tok, facio_token_t desc, vector* reqs, ast_node* stmts);
 ast_node* translation_unit_node(vector* stmts);
 
+void print_ast(ast_node* ast);
+void print_tu(ast_node* ast);
+void print_int(ast_node* ast);
+void print_float(ast_node* ast);
+void print_string(ast_node* ast);
+void print_identifier(ast_node* ast);
+void print_block(ast_node* ast);
+void print_unary_op(ast_node* ast);
+void print_binary_op(ast_node* ast);
+void print_if_stmt(ast_node* ast);
+void print_while_stmt(ast_node* ast);
+void print_return_stmt(ast_node* ast);
+void print_call_stmt(ast_node* ast);
+void print_function_def(ast_node* ast);
+void print_target_def(ast_node* ast);
+
 #endif // FACIO_AST_H_

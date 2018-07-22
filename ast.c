@@ -75,6 +75,7 @@ ast_node* if_stmt_node(ast_node* expr, ast_node* block)
   node->if_stmt.expr = expr;
   node->if_stmt.block = block;
   node->if_stmt.else_block = NULL;
+  node->if_stmt.elif_blocks = (vector*)malloc(sizeof(vector));
   vector_init(node->if_stmt.elif_blocks);
   return node;
 }
@@ -121,9 +122,80 @@ ast_node* target_def_node(facio_token_t tok, facio_token_t desc, vector* reqs, a
   node->target_def.block = stmts;
   return node;
 }
-ast_node* translation_unit_node(vector* stmts){
+ast_node* translation_unit_node(vector* stmts)
+{
   ast_node* node = (ast_node*)malloc(sizeof(ast_node));
   node->class = N_TRANSLATION_UNIT;
   node->translation_unit.stmts = stmts;
   return node;
 }
+
+void print_ast(ast_node* ast)
+{
+  switch (ast->class) {
+  case N_TRANSLATION_UNIT:
+    print_tu(ast);
+    break;
+  case N_INT:
+    print_int(ast);
+    break;
+  case N_FLOAT:
+    print_float(ast);
+    break;
+  case N_STRING:
+    print_string(ast);
+    break;
+  case N_IDENTIFIER:
+    print_identifier(ast);
+    break;
+  case N_BLOCK:
+    print_block(ast);
+    break;
+  case N_UNARY_OP:
+    print_unary_op(ast);
+    break;
+  case N_BINARY_OP:
+    print_binary_op(ast);
+    break;
+  case N_IF_STMT:
+    print_if_stmt(ast);
+    break;
+  case N_WHILE_STMT:
+    print_while_stmt(ast);
+    break;
+  case N_RETURN_STMT:
+    print_return_stmt(ast);
+    break;
+  case N_CALL_STMT:
+    print_call_stmt(ast);
+    break;
+  case N_FUNCTION_DEF:
+    print_function_def(ast);
+    break;
+  case N_TARGET_DEF:
+    print_target_def(ast);
+    break;
+  }
+}
+
+void print_tu(ast_node* ast){
+}
+void print_int(ast_node* ast){
+  printf("%li", ast->int_.value);
+}
+void print_float(ast_node* ast){
+  printf("%lf", ast->float_.value);
+}
+void print_string(ast_node* ast){
+  printf("%s", ast->string_.value);
+}
+void print_identifier(ast_node* ast);
+void print_block(ast_node* ast);
+void print_unary_op(ast_node* ast);
+void print_binary_op(ast_node* ast);
+void print_if_stmt(ast_node* ast);
+void print_while_stmt(ast_node* ast);
+void print_return_stmt(ast_node* ast);
+void print_call_stmt(ast_node* ast);
+void print_function_def(ast_node* ast);
+void print_target_def(ast_node* ast);

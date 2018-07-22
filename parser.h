@@ -25,8 +25,8 @@ ast_node* postfix_expression(facio_lexer* lexer);
 ast_node* primary_expression(facio_lexer* lexer);
 ast_node* function_definition(facio_lexer* lexer);
 ast_node* target_definition(facio_lexer* lexer);
-ast_node* identifier_list(facio_lexer* lexer);
-ast_node* argument_list(facio_lexer* lexer);
+vector* identifier_list(facio_lexer* lexer);
+vector* argument_list(facio_lexer* lexer);
 ast_node* block(facio_lexer* lexer);
 
 
