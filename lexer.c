@@ -17,7 +17,6 @@ facio_token_t set_ret(facio_lexer* lexer, facio_token_t tok)
   lexer->column_num_ += strlen(tok.src);
   lexer->tok = lexer->next;
   lexer->next= tok;
-  printf("[%s::%s]\n", facio_token_type_string(lexer->tok.type), lexer->tok.src);
   return lexer->tok;
 }
 
@@ -75,6 +74,8 @@ scan:
     goto scan;
   case '\n':
   case '\r':
+    ++lexer->line_num_;
+    lexer->column_num_ = 0;
     return set_ret(lexer, facio_get_token(T_EOL, "EOL"));
   case '(':
     return set_ret(lexer, facio_get_token(T_LPAREN, "("));
@@ -86,6 +87,10 @@ scan:
     return set_ret(lexer, facio_get_token(T_RBRACE, "}"));
   case ':':
     return set_ret(lexer, facio_get_token(T_COLON, ":"));
+  case ';':
+    return set_ret(lexer, facio_get_token(T_SEMI_COLON, ";"));
+  case ',':
+    return set_ret(lexer, facio_get_token(T_COMMA, ","));
   case '%':
     return set_ret(lexer, facio_get_token(T_OP_MOD, "%"));
   case '+':

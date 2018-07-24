@@ -1,3 +1,10 @@
-if(BaseName(ENV:SHELL) == 'fish')
+def Exec(cmd)
+  Print("Running" , A:cmd)
+
+if(ENV:SHELL == 'fish')
   G:SHELL="/usr/bin/bash"
   Print("Set shell to bash")
+
+all; core
+  Print("{}", G:SHELL)
+

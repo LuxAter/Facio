@@ -178,24 +178,65 @@ void print_ast(ast_node* ast)
   }
 }
 
-void print_tu(ast_node* ast){
+void print_tu(ast_node* ast)
+{
+  for (int i = 0; i < ast->translation_unit.stmts->count; ++i) {
+    print_ast((ast_node*)vector_get(ast->translation_unit.stmts, i));
+    printf("\n");
+  }
 }
-void print_int(ast_node* ast){
-  printf("%li", ast->int_.value);
+void print_int(ast_node* ast)
+{
+  printf("%li ", ast->int_.value);
 }
-void print_float(ast_node* ast){
-  printf("%lf", ast->float_.value);
+void print_float(ast_node* ast)
+{
+  printf("%lf ", ast->float_.value);
 }
-void print_string(ast_node* ast){
-  printf("%s", ast->string_.value);
+void print_string(ast_node* ast)
+{
+  printf("%s ", ast->string_.value);
 }
-void print_identifier(ast_node* ast);
-void print_block(ast_node* ast);
-void print_unary_op(ast_node* ast);
-void print_binary_op(ast_node* ast);
-void print_if_stmt(ast_node* ast);
-void print_while_stmt(ast_node* ast);
-void print_return_stmt(ast_node* ast);
-void print_call_stmt(ast_node* ast);
-void print_function_def(ast_node* ast);
-void print_target_def(ast_node* ast);
+void print_identifier(ast_node* ast)
+{
+  printf("%s:%s ", ast->identifier.scope, ast->identifier.value);
+}
+void print_block(ast_node* ast)
+{
+  for (int i = 0; i < ast->translation_unit.stmts->count; ++i) {
+    print_ast((ast_node*)vector_get(ast->translation_unit.stmts, i));
+    printf("\n");
+  }
+}
+void print_unary_op(ast_node* ast)
+{
+}
+void print_binary_op(ast_node* ast)
+{
+  print_ast(ast->binary_op.left);
+  printf("%s ", facio_token_type_string(ast->binary_op.op.type));
+  print_ast(ast->binary_op.right);
+}
+void print_if_stmt(ast_node* ast)
+{
+  printf("IF ");
+  print_ast(ast->if_stmt.expr);
+  printf("THEN ");
+  print_ast(ast->if_stmt.block);
+}
+void print_while_stmt(ast_node* ast) {}
+void print_return_stmt(ast_node* ast) {}
+void print_call_stmt(ast_node* ast)
+{
+  print_ast(ast->call_stmt.id);
+  printf("(");
+  for (int i = 0; i < ast->call_stmt.args->count; ++i) {
+    print_ast((ast_node*)vector_get(ast->call_stmt.args, i));
+    if (i != ast->call_stmt.args->count - 1) {
+      printf(", ");
+    }
+  }
+  printf(") ");
+}
+void print_function_def(ast_node* ast) {}
+void print_target_def(ast_node* ast) {}

@@ -26,6 +26,7 @@
   t(LBRACK, "[")\
   t(RBRACK, "]")\
   t(COLON, ":")\
+  t(SEMI_COLON, ";")\
   t(QMARK, "?")\
   t(OP_OR, "or")\
   t(OP_AND, "and")\

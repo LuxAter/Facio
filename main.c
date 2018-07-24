@@ -1,11 +1,13 @@
 #include "lexer.h"
 #include "parser.h"
+#include "ast.h"
 
 int main(int argc, char *argv[])
 {
   facio_lexer lex;
   facio_lexer_init(&lex, "build");
-  facio_parse(&lex);
+  ast_node* ast = facio_parse(&lex);
+  print_ast(ast);
   /* int i = 0; */
   /* while(lex.tok.type != T_EOS){ */
   /*   i++; */
