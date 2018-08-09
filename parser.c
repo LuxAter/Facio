@@ -49,7 +49,7 @@ ast_node* statement(facio_lexer* lexer)
   } else if (tok.type == T_DEF) {
     node = function_definition(lexer);
   } else if (tok.type == T_IDENTIFIER) {
-    if(facio_peek(lexer).type == T_SEMI_COLON){
+    if(facio_peek(lexer).type == T_STRING || facio_peek(lexer).type == T_SEMI_COLON){
       node = target_definition(lexer);
     }else{
       node = expression(lexer);
@@ -245,6 +245,7 @@ ast_node* target_definition(facio_lexer* lexer) {
   facio_token_t desc = facio_get_token_string(T_STRING, "");
   if(facio_scan(lexer).type == T_STRING){
     desc = lexer->tok;
+    facio_scan(lexer);
   }
   eat_token(lexer, T_SEMI_COLON);
   vector* req_list = identifier_list(lexer);

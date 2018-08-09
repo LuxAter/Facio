@@ -116,8 +116,8 @@ ast_node* target_def_node(facio_token_t tok, facio_token_t desc, vector* reqs, a
 
   ast_node* node = (ast_node*)malloc(sizeof(ast_node));
   node->class = N_TARGET_DEF;
-  node->target_def.name = tok.value.string_;
-  node->target_def.description = desc.value.string_;
+  node->target_def.name = strdup(tok.src);
+  node->target_def.description = strdup(desc.value.string_);
   node->target_def.reqs = reqs;
   node->target_def.block = stmts;
   return node;

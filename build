@@ -5,6 +5,9 @@ if(ENV:SHELL == 'fish')
   G:SHELL="/usr/bin/bash"
   Print("Set shell to bash")
 
-all; core
+all"Builds all source files"; core
   Print("{}", G:SHELL)
+
+*.o "Compiles source of script"; *.c
+  CXX(A:*)
 
