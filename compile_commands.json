@@ -1,9 +1,1 @@
-[{
-  "arguments": ["c++", "-c", "-MMD", "-I/home/arden/Programming/bash/facio/include", "-o", "/home/arden/Programming/bash/facio/src/calc.cpp.o", "/home/arden/Programming/bash/facio/src/calc.cpp"],
-  "directory": "/home/arden/Programming/bash/facio/src",
-  "file": "calc.cpp"
-}, {
-  "arguments": ["c++", "-c", "-MMD", "-I/home/arden/Programming/bash/facio/include", "-o", "/home/arden/Programming/bash/facio/src/main.cpp.o", "/home/arden/Programming/bash/facio/src/main.cpp"],
-  "directory": "/home/arden/Programming/bash/facio/src",
-  "file": "main.cpp"
-}]
+[{"arguments": ["c++", "-c", "-MMD", "-I/home/arden/Programming/bash/facio/include", "-o", "/home/arden/Programming/bash/facio/src/calc.cpp.o", "/home/arden/Programming/bash/facio/src/calc.cpp"], "directory": "/home/arden/Programming/bash/facio/src", "file": "calc.cpp"}, {"arguments": ["c++", "-c", "-MMD", "-I/home/arden/Programming/bash/facio/include", "-o", "/home/arden/Programming/bash/facio/src/main.cpp.o", "/home/arden/Programming/bash/facio/src/main.cpp"], "directory": "/home/arden/Programming/bash/facio/src", "file": "main.cpp"}]

@@ -116,6 +116,8 @@ def handle_response(msg, cmd):
         print("\033[A[{:3.0f}%] {}{}{}".format(PERC, color("\033[34;1m"), cmd,
                                                color("\033[0m")))
         c = '\033[34;1m'
+    else:
+        return
     print(
         color(c) + ">>  " + color("\033[0m") +
         msg.replace('\n', '\n' + color(c) + '>>  ' + color('\033[0m')))
