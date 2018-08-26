@@ -10,8 +10,6 @@ import fnmatch
 import subprocess
 import json
 
-from pprint import pprint
-
 CONFIG = configparser.ConfigParser()
 CMDS = []
 COLOR = True
@@ -24,7 +22,6 @@ STEP = 0.0
 
 def color(code):
     """Returns the color code if COLOR is set to true, otherwise it returns an empty string."""
-    global COLOR
     if COLOR:
         return code
     return ""
@@ -45,9 +42,10 @@ def note(msg):
     print("{}Note: {}{}".format(color("\033[1;34m"), msg, color("\033[0m")))
 
 
-def in_cmds(dir, file):
+def in_cmds(dirs, file):
+    """Checks if cmd is in the command list"""
     for i, cmd in enumerate(CMDS):
-        if cmd['directory'] == dir and cmd['file'] == file:
+        if cmd['directory'] == dirs and cmd['file'] == file:
             return i
     return None
 
@@ -99,31 +97,33 @@ def scan_deps(target):
 
 
 def handle_response(msg, cmd):
-    c = ''
+    """Prints the response with color coding"""
+    col = ''
     if "fatal error:" in msg:
         print("\033[A[{:3.0f}%] {}{}{}".format(PERC, color("\033[31;1m"), cmd,
                                                color("\033[0m")))
-        c = '\033[31;1m'
+        col = '\033[31;1m'
     elif "error:" in msg:
         print("\033[A[{:3.0f}%] {}{}{}".format(PERC, color("\033[31;1m"), cmd,
                                                color("\033[0m")))
-        c = '\033[31;1m'
+        col = '\033[31;1m'
     elif "warning:" in msg:
         print("\033[A[{:3.0f}%] {}{}{}".format(PERC, color("\033[33;1m"), cmd,
                                                color("\033[0m")))
-        c = '\033[33;1m'
+        col = '\033[33;1m'
     elif "note:" in msg:
         print("\033[A[{:3.0f}%] {}{}{}".format(PERC, color("\033[34;1m"), cmd,
                                                color("\033[0m")))
-        c = '\033[34;1m'
+        col = '\033[34;1m'
     else:
         return
     print(
-        color(c) + ">>  " + color("\033[0m") +
-        msg.replace('\n', '\n' + color(c) + '>>  ' + color('\033[0m')))
+        color(col) + ">>  " + color("\033[0m") +
+        msg.replace('\n', '\n' + color(col) + '>>  ' + color('\033[0m')))
 
 
 def check_deps(target, deps):
+    """Checks the update time on dependencies and determins if target must be compiled"""
     if os.path.isfile(target):
         dest = os.path.getmtime(target)
     else:
@@ -138,9 +138,10 @@ def check_deps(target, deps):
 
 
 def Exec(cmd):
-    global DRY
-    if DRY == True:
+    """Runs command if not dry-run, else prints command"""
+    if DRY is True:
         print(">>  " + cmd)
+        return None
     else:
         return subprocess.run(
             cmd.split(), stdout=subprocess.PIPE,
@@ -300,6 +301,7 @@ def main():
         "--gen-cmds",
         action="store_true",
         help="Generates a compile_commands.json")
+    parser.add_argument("-m", "--gen-make", action="store_true", help="Generates a makefile for GNU make")
     parser.add_argument(
         "-C",
         "--no-color",
@@ -340,7 +342,7 @@ def main():
         for tar in CONFIG.sections():
             if ('run' in CONFIG[tar] and
                     CONFIG[tar]['run'] == 'true') or 'run' not in CONFIG[tar]:
-                if tar not in targets:
+                if tar not in targets and tar != 'settings':
                     add_deps(tar)
     global STEP
     global PERC
