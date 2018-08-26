@@ -4,22 +4,41 @@ This script is used to compile projects, or to generate compile scrips.
 """
 
 import sys
+import fnmatch
 
 import facioparser
 
+
 class Target(object):
-    default_data = {'msg': '', 'msg_color': '0', 'deps': [], 'cmd': '','pre_cmd': '', 'post_cmd': ''}
+    data = {
+        'target': '',
+        'msg': '',
+        'msg_color': '0',
+        'dep': [],
+        'cmd': '',
+        'pre_cmd': '',
+        'post_cmd': '',
+        'build_dir': '.'
+    }
     options = {}
 
     def __init__(self, section):
-        for key in self.default_data:
-            if key in section:
-                self.default_data[key] = section[key]
-        print(self.default_data)
+        for key in self.data:
+            if key == 'dep' and key in section:
+                self.data[key] = section[key].split()
+            elif key in section:
+                self.data[key] = section[key]
+        print(self.data)
 
     def __repr__(self):
-        return "\033[{}m{}\033[0m".format(self.default_data['msg_color'],
-                                          self.default_data['msg'])
+        return "\033[{}m{}\033[0m".format(self.data['msg_color'],
+                                          self.data['msg'])
+
+    def check_deps(self, target):
+        print(fnmatch.translate(self.data['target']))
+        # regex = re.compile(fnmatch.translate(self.data['target']))
+        # if any(reg in self.data['target'] for reg in ('*', '?'))
+
 
 
 def main():
@@ -33,7 +52,9 @@ def main():
         else:
             if parser.is_target(sys.argv[1]):
                 target = Target(parser.get_target(sys.argv[1]))
+                target.check_deps(sys.argv[1])
                 print(target)
+
 
 if __name__ == "__main__":
     main()

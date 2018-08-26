@@ -23,7 +23,7 @@ class Parser(object):
             elif line.startswith('[') and line.endswith(']'):
                 line = line[1:-1]
                 current = line
-                self.data[current] = {'cmds': []}
+                self.data[current] = {'target': current.split(';')[0], 'cmds': []}
                 if ';' in line:
                     tmp = line.split(';')
                     self.data[current]['varient'] = tmp[
