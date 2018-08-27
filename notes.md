@@ -1,12 +1,16 @@
 # Facio Build System #
 
-## Target ##
+## Script based ##
 
-* Type
-* Dependencies
-* Source Directory
-* Build Directory
-* Default Run
-* Pre CMD
-* CMD
-* Post CMD
+* Extreamly Extendable
+* Very customizable
+* Easily convertable
+* Takes more base effort
+
+## Prebuilt ##
+
+* Easier to use
+* Less customizable
+* Faster?
+* More work?
+
