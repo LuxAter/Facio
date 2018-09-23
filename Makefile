@@ -5,16 +5,14 @@ ifndef .VERBOSE
 endif
 
 ROOT=$(shell pwd)
-SPACE=$(null) #
-COMMA=,
 
 C=clang
-CXX=clang++
 CFLAGS=
-CXXFLAGS=
 CLINK=-lm -lxcb
-CXXLINK=
 INSTALL_PATH=/usr/local
+BUILD_DIR=build
+SOURCE_DIR=src
+INCLUDE_DIR=include
 
 SCAN_COLOR=\033[1;35m
 BUILD_COLOR=\033[32m
@@ -27,9 +25,7 @@ define scan_target
 printf "%b%s%b\n" "$(SCAN_COLOR)" "Scaning dependencies for target $(1)" "\033[0m"
 endef
 define complete_target
-printf "%s\n" "Built target $(1)"
-endef
-define clean_target
+printf "%s\n" "Built target $(1)" endef define clean_target
 printf "%b%s%b\n" "$(CLEAN_COLOR)" "Cleaning target $(1)" "\033[0m"
 endef
 define install_target
@@ -74,29 +70,14 @@ install: install-libentis.a
 
 uninstall: uninstall-libentis.a
 
-help:
-	$(call help,help,shows this help page)
-	$(call help,all,compiles core targets)
-	$(call help,clean,removes all build files)
-	$(call help,install,installs core targets)
-	$(call help,uninstall,uninstalls core targets)
-	$(call help,build-entis,compiles just entis)
-	$(call help,clean-entis,cleans entis target)
-	$(call help,install-entis,installs entis target)
-	$(call help,uninstall-entis,uninstalls entis target)
-	$(call help,build-libentis.a,compiles just libentis.a)
-	$(call help,clean-libentis.a,cleans entis target)
-	$(call help,install-libentis.a,installs entis target)
-	$(call help,uninstall-libentis.a,uninstalls entis target)
-
-
+# ENTIS {{{
 ENTIS_FILES=src/main.c
 ENTIS_OBJS=$(ENTIS_FILES:%=$(ROOT)/build/entis/%.o)
 -include $(ENTIS_OBJS:%.o=%.d)
-build-entis: build-libentis.a pre_entis entis
+build-entis: build-libentis.a pre_entis ./entis
 	$(call complete_target,entis)
 
-entis: $(ENTIS_OBJS)
+./entis: $(ENTIS_OBJS)
 	$(call print_link_exe_c,$@)
 	$(C) $^ $(ROOT)/build/libentis.a/libentis.a $(CLINK) -o $@
 
@@ -127,7 +108,8 @@ $(ROOT)/build/entis/%.cpp.o: %.cpp
 	mkdir -p $(@D)
 	$(call print_build_cpp,$@)
 	$(CXX) $(CXXFLAGS) -MMD -c $(INCLUDE) $^ -o $@
-
+# }}}
+# LIBENTIS.A {{{
 LIBENTIS.A_FILES=$(filter-out src/main.c, $(shell find "src/" -name "*.c"))
 LIBENTIS.A_OBJS=$(LIBENTIS.A_FILES:%=$(ROOT)/build/libentis.a/%.o)
 LIBENTIS.A_HEADER_FILES=$(shell find "src/" -name "*.h")
@@ -138,7 +120,7 @@ build-libentis.a: pre_libentis.a $(ROOT)/build/libentis.a/libentis.a
 	$(call complete_target,libentis.a)
 
 $(ROOT)/build/libentis.a/libentis.a: $(LIBENTIS.A_OBJS)
-	$(call print_link_lib_c,$@)
+        $(call print_link_lib_c,$@)
 	ar rsc $@ $^
 
 pre_libentis.a:
@@ -171,3 +153,4 @@ $(ROOT)/build/libentis.a/%.cpp.o: %.cpp
 	mkdir -p $(@D)
 	$(call print_build_cpp,$@)
 	$(CXX) $(CXXFLAGS) -MMD -c $(INCLUDE) $^ -o $@
+# }}}

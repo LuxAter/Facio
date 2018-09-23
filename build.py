@@ -589,7 +589,10 @@ def count_targets(target):
     return list(set(tars))
 
 def generate_makefile():
-    pass
+    lines = []
+    if os.path.isfile('Makefile'):
+        with open('Makefile', 'r') as file:
+            lines = [x.rstrip('\n') for x in file.readlines()]
 
 def main():
     global VARIABLES, TARGETS, STEP, CMD_VARS, COMPILE_COMMANDS
