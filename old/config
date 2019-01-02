@@ -1,8 +1,0 @@
-all: signi
-    print("Hello!")
-
-signi: libsigni.a
-    print("%b%redSigni!")
-
-libsigni.a:
-    print("LIBSIGNI.a")

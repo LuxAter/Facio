@@ -1,0 +1,41 @@
+{
+    "CXX": "clang++",
+    "CXXIGNORE": "",
+    "CXXFLAGS": ["-stc=c++17", "-fPIC", "-Wall", "-Wpedantic", "static"],
+    "link": "-lz",
+    "source": "source",
+    "include_dir": "include",
+    "include": "-I$(ROOT)/$(EXTERNAL)/estl -I$(ROOT)/$(BUILD)/libpng/include -I$(ROOT)/$(BUILD)/libjpeg/include",
+    "build": "build",
+    "external": "external",
+    "test": "test",
+    "signi":{
+        "path": "{{root}}/signi",
+        "files": "{{source}}/main.cpp",
+        "type": "exe",
+        "dep": [
+            "libsigni.a"
+        ]
+    },
+    "libsigni.a": {
+        "path": "{{build}}/libsigni.a",
+        "files": "{{source}}/*.cpp",
+        "files_exclude": "{{source}}/main.cpp",
+        "type": "lib",
+        "join": true,
+        "dep": [
+            "libpng",
+            "libjpeg"
+        ]
+    },
+    "libpng": {
+        "path": "{{build}}/libpng",
+        "source": "{{external}}/libpng",
+        "type": "aumake"
+    },
+    "libjpeg": {
+        "path": "{{build}}/libjpeg",
+        "source": "{{external}}/jpeg-8d",
+        "type": "aumake"
+    }
+}
