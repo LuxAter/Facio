@@ -42,6 +42,8 @@ def gen_exe(target, targets):
             for x in target['dep']
             if targets[x]['type'] == 'lib'
         ])
+        if 'gtest' in target['dep']:
+            target['link_deps'] += ' {}/libgtest.a -lpthread'.format(targets['gtest']['path'])
         target['dep'] = "build-" + " build-".join(target['dep'])
     else:
         target['link_deps'] = ''
@@ -111,6 +113,7 @@ def gen_lib(target, targets):
         target['file_find'] = "$(filter-out {}, {})".format(
             target['files_exclude'], target['file_find'])
     if 'join' in target and target['join'] is True:
+        # TODO: Fix bug here as it will only work with lib stuffs
         target['join'] = '\n\t'.join(["mkdir -p $(ROOT)/tmp/{0} && cd $(ROOT)/tmp/{0} && ar x {1}/lib/{0} && ar qc $(ROOT)/$@ $(ROOT)/tmp/{0}/*.o && rm -rf $(ROOT)/tmp/{0}".format(x, targets[x]['path']) for x in target['link_deps']])
     else:
         target['join'] = ''
@@ -213,6 +216,45 @@ pre-{name}:
 	$(call scan_target,{name})
 """.format(**target)
 
+def gen_gtest(target, targets):
+    if 'dep' in target:
+        target['dep'] = "build-" + " build-".join(target['dep'])
+    else:
+        target['dep'] = ''
+    return """
+build-{name}: {dep} pre-gtest {path}/lib{name}.a
+	$(call complete_target,googletest)
+
+clean-{name}:
+	$(call clean_target,googletest)
+	if [ -d "{path}/googletest" ]; then rm {path}/googletest -r; fi
+	if [ -e "{path}/lib{name}.a" ]; then rm {path}/lib{name}.a; fi
+
+pre-{name}:
+	$(call scan_target,googletest)
+
+{path}/libgtest.a: {source}/src/gtest-all.cc {source}/src/gtest_main.cc
+	mkdir -p {path}/googletest
+	$(call print_build_cpp,{path}/googletest/gtests_all.o)
+	$(CXX) -isystem {source}/include -I{source} -pthread -c {source}/src/gtest-all.cc -o {path}/googletest/gtests_all.o
+	$(call print_build_cpp,{path}/googletest/gtests_main.o)
+	$(CXX) -isystem {source}/include -I{source} -pthread -c {source}/src/gtest_main.cc -o {path}/googletest/gtests_main.o
+	$(call print_link_lib,libgtest.a)
+	ar -rc {path}/lib{name}.a {path}/googletest/gtests_main.o {path}/googletest/gtests_all.o
+""".format(**target)
+
+def gen_cmd(target, targets):
+    if 'dep' in target:
+        target['dep'] = "build-" + " build-".join(target['dep'])
+    else:
+        target['dep'] = ''
+    return """
+{name}: {dep}
+	$(call execute,{name})
+	{cmd}
+	$(call complete_target,{name})
+
+""".format(**target)
 
 def gen_target(target, targets):
     src = "# {} ".format(target['title']) + "{{{\n"
@@ -226,6 +268,10 @@ def gen_target(target, targets):
         return src + gen_faumake(target, targets) + "\n# }}}\n"
     elif target['type'] == 'make':
         return src + gen_make(target, targets) + "\n# }}}\n"
+    elif target['type'] == 'gtest':
+        return src + gen_gtest(target, targets) + "\n# }}}\n"
+    elif target['type'] == 'cmd':
+        return src + gen_cmd(target, targets) + "\n# }}}\n"
 
 
 def gen_pre(settings):
@@ -291,13 +337,13 @@ endef
 def gen_post(settings):
     return """
 $(ROOT)/$(BUILD)/%.cpp.o: %.cpp
-	$(call print_build_cpp,$@)
 	mkdir -p $(@D)
+	$(call print_build_cpp,$@)
 	$(CXX) $(CXXFLAGS) -MMD -c $(COMMON_INCLUDE) $< -o $@
 
 $(ROOT)/$(BUILD)/%.c.o: %.c
-	$(call print_build_c,$@)
 	mkdir -p $(@D)
+	$(call print_build_c,$@)
 	$(CC) $(CCFLAGS) -MMD -c $(COMMON_INCLUDE) $< -o $@
 
 FORCE:
@@ -376,8 +422,8 @@ def modify_config(config, args):
         obj['files_exclude'] = args.exclude.replace('[[', '$(').replace(']]', ')')
     if 'files' in args and args.files:
         obj['files'] = args.files.replace('[[', '$(').replace(']]', ')')
-    if 'deps' in args and args.deps:
-        obj['deps'] = args.deps
+    if 'dep' in args and args.dep:
+        obj['dep'] = args.dep
     if 'join' in args and args.join:
         obj['join'] = True
     if 'source' in args and args.source:
@@ -421,14 +467,14 @@ def main():
     exe.add_argument('files', help="Files to use for target")
     exe.add_argument('exclude', nargs="?", help="Files to exclude from target")
     exe.add_argument('group', nargs='?', help="Adds target to group target")
-    exe.add_argument('deps', nargs='*', help="Target dependencies")
+    exe.add_argument('dep', nargs='*', help="Target dependencies")
     lib = msubparsers.add_parser('lib', help="Add lib target")
     lib.add_argument('name', help="Name of the target")
     lib.add_argument('path', help="Destination path")
     lib.add_argument('files', help="Files to use for target")
     lib.add_argument('exclude', nargs="?", help="Files to exclude from target")
     lib.add_argument('group', nargs='?', help="Adds target to group target")
-    lib.add_argument('deps', nargs='*', help="Target dependencies")
+    lib.add_argument('dep', nargs='*', help="Target dependencies")
     lib.add_argument('--join', action="store_true", help="Joins target dependencies into one library")
     aumake = msubparsers.add_parser('aumake', help="Add aumake target")
     aumake.add_argument('name', help="Name of the target")
