@@ -48,12 +48,16 @@ def gen_exe(target, targets):
     else:
         target['link_deps'] = ''
         target['dep'] = ''
-    if '*' in target['files']:
-        target['file_find'] = "$(shell find \"{}\" -name \"{}\")".format(
-            target['files'].split('*')[0], '*' + target['files'].split('*')[1])
+    if isinstance(target['files'], list):
+        for i in range(len(target['files'])):
+            if '*' in target['files'][i]:
+                target['files'][i] = "$(shell find \"{}\" -name \"{}\")".format(
+                    target['files'][i].split('*')[0], '*' + target['files'][i].split('*')[1])
+        target['file_find'] = ' '.join(target['files'])
     else:
-        if isinstance(target['files'], list):
-            target['files'] = ' '.join(target['files'])
+        if '*' in target['files']:
+            target['files'] = "$(shell find \"{}\" -name \"{}\")".format(
+                target['files'].split('*')[0], '*' + target['files'].split('*')[1])
         target['file_find'] = target['files']
     if 'files_exclude' in target:
         if isinstance(target['files_exclude'], list):
@@ -100,12 +104,16 @@ def gen_lib(target, targets):
     else:
         target['dep'] = ''
         target['clean_deps'] = ''
-    if '*' in target['files']:
-        target['file_find'] = "$(shell find \"{}\" -name \"{}\")".format(
-            target['files'].split('*')[0], '*' + target['files'].split('*')[1])
+    if isinstance(target['files'], list):
+        for i in range(len(target['files'])):
+            if '*' in target['files'][i]:
+                target['files'][i] = "$(shell find \"{}\" -name \"{}\")".format(
+                    target['files'][i].split('*')[0], '*' + target['files'][i].split('*')[1])
+        target['file_find'] = ' '.join(target['files'])
     else:
-        if isinstance(target['files'], list):
-            target['files'] = ' '.join(target['files'])
+        if '*' in target['files']:
+            target['files'] = "$(shell find \"{}\" -name \"{}\")".format(
+                target['files'].split('*')[0], '*' + target['files'].split('*')[1])
         target['file_find'] = target['files']
     if 'files_exclude' in target:
         if isinstance(target['files_exclude'], list):
@@ -379,7 +387,7 @@ def gen_group(targets):
 
 
 def parse_config(raw):
-    settings = {'root': os.getcwd()}
+    settings = {}
     targets = {}
     for key, value in raw.items():
         if isinstance(value, str):
